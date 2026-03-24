@@ -18,7 +18,7 @@ python3 -m http.server 8000
 ```
 Then visit `http://localhost:8000` in your browser.
 
-Or, alternatively, use the live demo at [https://nsanders.me/2026-03-23_where_does_the_money_go/](https://nsanders.me/2026-03-23_where_does_the_money_go/)
+Or, alternatively, use the live demo at [http://nsanders.me/where-does-the-money-go/](http://nsanders.me/where-does-the-money-go/)
 
 # Disclosure
 
