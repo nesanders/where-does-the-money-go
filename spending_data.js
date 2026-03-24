@@ -1361,5 +1361,26 @@ const spendingData = {
     "2024-10",
     "2024-11",
     "2024-12"
-  ]
+  ],
+  "transfers": {
+    "total": 530000.0,
+    "recipients": [
+      {
+        "recipient": "DCCC",
+        "amount": 520000.0
+      },
+      {
+        "recipient": "CORI BUSH FOR CONGRESS",
+        "amount": 4000.0
+      },
+      {
+        "recipient": "SUSAN WILD FOR CONGRESS",
+        "amount": 4000.0
+      },
+      {
+        "recipient": "PAT RYAN FOR CONGRESS",
+        "amount": 2000.0
+      }
+    ]
+  }
 };

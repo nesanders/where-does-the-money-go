@@ -78,6 +78,12 @@ def process_data():
     for col in sane_monthly.columns:
         sane_monthly_obj[str(col)] = [{"month": str(idx), "amount": float(val)} for idx, val in sane_monthly[col].items() if pd.notnull(idx)]
 
+    # 8. Allies / Contributions
+    transfers = df[df['disbursement_purpose_category'] == 'CONTRIBUTIONS']
+    total_transfers = float(transfers['disbursement_amount'].sum())
+    top_transfers = transfers.groupby('recipient_name')['disbursement_amount'].sum().sort_values(ascending=False)
+    top_transfers_list = [{"recipient": str(k), "amount": float(v)} for k, v in top_transfers.items() if v > 0]
+
     data = {
         "total_spent": total_spent,
         "categories": cat_spend_list,
@@ -89,7 +95,11 @@ def process_data():
         },
         "sane_categories": sane_spend_list,
         "sane_monthly": sane_monthly_obj,
-        "all_months": [str(m) for m in sane_monthly.index if pd.notnull(m)]
+        "all_months": [str(m) for m in sane_monthly.index if pd.notnull(m)],
+        "transfers": {
+            "total": total_transfers,
+            "recipients": top_transfers_list
+        }
     }
 
     with open('spending_data.js', 'w') as f:

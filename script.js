@@ -325,3 +325,31 @@ new Chart(ctxSaneTimeline, {
         }
     }
 });
+
+// 9. Transfers & Allies Contributions Chart
+const ctxTransfers = document.getElementById('transfersChart').getContext('2d');
+new Chart(ctxTransfers, {
+    type: 'bar',
+    data: {
+        labels: spendingData.transfers.recipients.map(d => d.recipient).slice(0, 10),
+        datasets: [{
+            label: 'Amount Contributed',
+            data: spendingData.transfers.recipients.map(d => d.amount).slice(0, 10),
+            backgroundColor: 'rgba(63, 185, 80, 0.85)',
+            borderRadius: 6
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (ctx) => formatMoney(ctx.raw) } }
+        },
+        scales: {
+            x: { grid: { color: colors.grid }, ticks: { callback: (val) => formatMoney(val) } },
+            y: { grid: { display: false }, ticks: { autoSkip: false, font: {size: 10} } }
+        }
+    }
+});
