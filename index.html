@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AOC 2024 Campaign Finance Analyzer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Annotation Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .intro-box {
+            background: rgba(31, 111, 235, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 2rem;
+            color: #d1d5db;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            backdrop-filter: blur(10px);
+        }
+        .intro-box p {
+            margin-bottom: 1rem;
+        }
+        .intro-box p:last-child {
+            margin-bottom: 0;
+        }
+        .card-header p {
+            line-height: 1.6;
+            margin-top: 0.5rem;
+            color: #9cb1c6;
+        }
+        .vendor-glossary {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .vendor-glossary ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .vendor-glossary li {
+            margin-bottom: 0.5rem;
+        }
+        .vendor-name {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="background-aurora"></div>
+    <header>
+        <div class="header-content">
+            <h1>Where Does the Money Go?</h1>
+            <p class="subtitle">An interactive analysis of the AOC 2024 Congressional campaign expenditures.</p>
+        </div>
+        <div class="stat-badge">
+            <span class="stat-label">Total Outlays</span>
+            <span class="stat-value" id="totalSpent">$0.00</span>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <!-- Educational Intro -->
+        <section class="intro-box">
+            <p><strong>Welcome to the Campaign Finance Analyzer for Alexandria Ocasio-Cortez (AOC).</strong> Data presented here is sourced directly from <a href="https://www.fec.gov/data/disbursements/?committee_id=C00639591&two_year_transaction_period=2024&data_type=processed" target="_blank" style="color: var(--accent-color); text-decoration: underline;">the Federal Election Commission (FEC) processed data</a> for the Alexandria Ocasio-Cortez for Congress committee. Every transaction above a certain threshold is publicly reported under strict transparency rules.</p>
+            <p><strong>Is AOC's campaign typical?</strong> No, her campaign finance structure is highly atypical for a federal candidate. While many politicians rely primarily on corporate Political Action Committees (PACs) and high-dollar fundraising galas—often funneling money exclusively to high-end media consulting firms—AOC's campaign is driven predominantly by grassroots, small-dollar donors. This means her spending is heavily biased toward digital organizing, small merchandise fulfillment, and an unusually robust payroll dedicated to internal organizing staff rather than entirely outsourcing to agencies.</p>
+        </section>
+
+        <!-- Main Expenditure Categories -->
+        <section class="card widget-large">
+            <div class="card-header">
+                <h2>FEC Official Spending by Category</h2>
+                <p>When campaigns file expense reports with the FEC, they must classify their disbursements (spending) into broad categories, such as "Administrative", "Fundraising", or "Travel". This high-level distribution provides an initial glance at a campaign's priorities. AOC's heavy emphasis on digital organizing, merchandise, and maintaining a well-paid staff causes certain categories to swell larger than average.</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Sane Categorization -->
+        <section class="card widget-large insight-card" style="border-left-color: #d2a8ff;">
+            <div class="card-header">
+                <h2>Sane Categorization (Smart Parsing)</h2>
+                <p>Since raw FEC categories (like the massive "OTHER" bucket) can obscure the true functional purpose of spending, we implemented a <em>Smart Parsing Classifier</em>. By analyzing individual transaction memos and vendor names (e.g. mapping "Gusto" to Payroll, or "FB/Google" to Media Ads), we recalculate the budget into human-readable buckets. The charts below display this corrected, "sane" view of the campaign's finances.</p>
+            </div>
+            <div class="chart-container" style="margin-bottom: 2rem;">
+                <canvas id="saneCategoryChart"></canvas>
+            </div>
+            <div class="card-header">
+                <h3>Sane Categories Over Time</h3>
+                <p>Tracking the functional "smart" categories over the cycle reveals precisely when hiring happens, when ad buys spike, and when SaaS/platform fees adjust.</p>
+            </div>
+            <div class="chart-container" style="height: 500px;">
+                <canvas id="saneTimelineChart"></canvas>
+            </div>
+        </section>
+
+        <!-- The "Other" Problem -->
+        <section class="card widget-large insight-card">
+            <div class="card-header">
+                <h2>Decoding the "OTHER" Category</h2>
+                <p>A massive portion of spending falls into an opaque FEC category labeled simply as "OTHER". This happens because FEC classifications are somewhat aged and rigid, often failing to neatly categorize modern digital services. By cracking open this bucket and looking at memo descriptions and specific payees, we reveal the true operational costs: digital ad networks, high-volume credit card merchant fees, extensive payroll taxes, and SaaS subscriptions. Understanding "OTHER" is critical to understanding any modern digital campaign.</p>
+            </div>
+            <div class="split-view">
+                <div class="chart-container split-half">
+                    <h3>By Detailed Description</h3>
+                    <canvas id="otherDescChart"></canvas>
+                </div>
+                <div class="chart-container split-half">
+                    <h3>Top Payees inside "OTHER"</h3>
+                    <canvas id="otherPayeesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid-row">
+            <!-- Timeline -->
+            <section class="card widget-medium">
+                <div class="card-header">
+                    <h2>Spending Over Time</h2>
+                    <p>Campaign spending happens in intense bursts surrounding critical events. We typically see elevated burn rates surrounding major fundraising drives, primaries (such as the June 2024 NY primary), and the general election sprint. <em>Vertical lines in the chart mark the approximate months for the primary and general elections.</em></p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Top Overall Payees -->
+            <section class="card widget-medium">
+                <div class="card-header">
+                    <h2>Top 10 Payees Overall</h2>
+                    <p>Look behind any major candidate, and you will find an ecosystem of specialized vendors. AOC's top vendor list underscores her atypical organizing strategy.</p>
+                    <div class="vendor-glossary">
+                        <ul>
+                            <li><span class="vendor-name">Middle Seat / Middle Seat Consulting:</span> A progressive digital agency specializing in grassroots fundraising, email programs, and digital advertising.</li>
+                            <li><span class="vendor-name">BREX:</span> A corporate credit card/expense management platform. Campaigns use Brex to distribute cards to staff to handle fast-moving operational costs, travel, and recurring software subscriptions.</li>
+                            <li><span class="vendor-name">Shopify:</span> E-commerce platform. AOC's campaign uniquely operates a massive merchandising wing, driving fundraising and brand presence.</li>
+                            <li><span class="vendor-name">ActBlue:</span> The ubiquitous Democratic technical platform for securely processing millions of small-dollar donations.</li>
+                            <li><span class="vendor-name">Gusto:</span> A modern cloud-based payroll, benefits, and human resource management software utilized to pay campaign staff.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="chart-container" style="height: 350px;">
+                    <canvas id="topPayeesChart"></canvas>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>Data sourced directly from the <a href="https://www.fec.gov/data/disbursements/?committee_id=C00639591&two_year_transaction_period=2024&data_type=processed" target="_blank" style="color:var(--text-muted);">Federal Election Commission (FEC)</a> Schedule B reports.</p>
+    </footer>
+
+    <!-- Load exported data -->
+    <script src="spending_data.js"></script>
+    <!-- Main JS logic -->
+    <script src="script.js"></script>
+</body>
+</html>
